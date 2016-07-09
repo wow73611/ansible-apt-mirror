@@ -1,0 +1,5 @@
+---
+- name: Deploy apt-mirror service
+  hosts: all
+  roles:
+    - apt_mirror

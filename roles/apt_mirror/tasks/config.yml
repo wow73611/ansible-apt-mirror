@@ -1,0 +1,58 @@
+---
+- name: Coping /etc/apt/mirror.list
+  template:
+    src: "etc/apt/mirror.list.j2"
+    dest: "/etc/apt/mirror.list"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Coping /etc/cron.d/apt-mirror
+  template:
+    src: "etc/cron.d/apt-mirror.j2"
+    dest: "/etc/cron.d/apt-mirror"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Coping /etc/nginx/sites-available/apt-mirror
+  template:
+    src: "etc/nginx/sites-available/apt-mirror.j2"
+    dest: "/etc/nginx/sites-available/apt-mirror"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enabling apt-mirror virtual host for nginx
+  file:
+    src: "/etc/nginx/sites-available/apt-mirror"
+    dest: "/etc/nginx/sites-enabled/apt-mirror"
+    force: yes
+    state: link
+
+- name: Disabling default virtual host for nginx
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
+
+- name: Ensuring /var/spool/apt-mirror permission
+  file:
+    path: "{{ apt_mirror_base_path }}"
+    owner: apt-mirror
+    group: apt-mirror
+    recurse: yes
+
+- name: Creating symbolic link of nginx/html/ubuntu
+  file:
+    src: "{{ apt_mirror_base_path }}/mirror/archive.ubuntu.com/ubuntu"
+    dest: "{{ nginx_root_directory }}/ubuntu"
+    force: yes
+    state: link
+
+- name: Restarting cron service
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - cron
+    - nginx

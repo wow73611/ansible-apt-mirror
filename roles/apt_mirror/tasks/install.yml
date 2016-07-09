@@ -1,0 +1,12 @@
+---
+- name: Updating apt cache
+  apt:
+    update_cache: yes
+
+- name: Installing apt-mirror packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - apt-mirror
+    - nginx

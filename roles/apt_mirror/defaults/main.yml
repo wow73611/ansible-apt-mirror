@@ -1,0 +1,3 @@
+---
+apt_mirror_base_path: /var/spool/apt-mirror
+nginx_root_directory: /usr/share/nginx/html
